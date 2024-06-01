@@ -276,15 +276,12 @@ class File:
 
         if len(self.label_list)>2:
             plt.legend(loc="best")
+
+        plt.xlabel(self.x1_label)
+        plt.ylabel(self.y1_label)
              
         self.save_as=self.title+".png"
         plt.savefig(self.save_as)
-
-        im=cv2.imread(self.save_as)
-        self.table_width=im.shape[1]
-
-        print(self.table_width)
-        print(im.shape[0])
 
 
 
