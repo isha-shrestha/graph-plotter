@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import dataframe_image as dfi
 from fpdf import FPDF
 import os
@@ -136,16 +137,18 @@ class File:
             self.four_set()
             return 0
 
-        self.data=[self.x1_values,self.y1_values,self.x2_values,
-                    self.y2_values,self.x3_values,self.y3_values]
+        self.data=np.array([self.x1_values,self.y1_values,
+                            self.x2_values,self.y2_values,
+                            self.x3_values,self.y3_values])
         self.pandas_dataframe3()
 
 
     #this returns the csv values as pandas dataframe object when there is 3 set of data
     def pandas_dataframe3(self):
-        self.dataframe=pd.DataFrame({self.x1_label:self.x1_values, self.y1_label:self.y1_values,
-                                self.x2_label:self.x2_values, self.y2_label:self.y2_values,
-                                self.x3_label:self.x3_values, self.y3_label:self.y3_values})
+        self.dataframe=pd.DataFrame(self.data,
+                                    columns=[self.first_label(),self.first,
+                                            self.second_label(),self.second,
+                                            self.third_label(),self.third])
 
         self.table_title=self.title+"_table.png"
         dfi.export(self.dataframe,self.table_title)
@@ -179,7 +182,8 @@ class File:
         self.dataframe=pd.DataFrame({self.x1_label:self.x1_values, self.y1_label:self.y1_values,
                                 self.x2_label:self.x2_values, self.y2_label:self.y2_values,
                                 self.x3_label:self.x3_values, self.y3_label:self.y3_values,
-                                self.x4_label:self.x4_values, self.y4_label:self.y4_values})
+                                self.x4_label:self.x4_values, self.y4_label:self.y4_values},
+                                columns=[self.first(),self.second(),self.third(),self.fourth()])
 
         self.table_title=self.title+"_table.png"
         dfi.export(self.dataframe,self.table_title)
@@ -262,14 +266,14 @@ class File:
             plt.plot(self.x1_values,self.y1_values,marker=".")
 
         if len(self.label_list)>2:
-            plt.plot(self.x1_values,self.y1_values,marker=".",label=self.first_label())
-            plt.plot(self.x2_values,self.y2_values,marker=".",label=self.second_label())
+            plt.plot(self.x1_values,self.y1_values,marker=".",label=self.first)
+            plt.plot(self.x2_values,self.y2_values,marker=".",label=self.second)
 
         if len(self.label_list)>4:
-            plt.plot(self.x3_values,self.y3_values,marker=".",label=self.third_label())  
+            plt.plot(self.x3_values,self.y3_values,marker=".",label=self.third)  
 
         if len(self.label_list)>6:  
-            plt.plot(self.x4_values,self.y4_values,marker=".",label=self.fourth_label())
+            plt.plot(self.x4_values,self.y4_values,marker=".",label=self.fourth)
 
         if len(self.label_list)>8:
             plt.plot(self.x5_values,self.y5_values,marker=".",label=self.fifth_label())   
