@@ -13,8 +13,8 @@ import cv2
 
 def main():
 
-    file1=File(fname(), ftype(), graph_title())
-    file1.open_csv()
+    file1=File(fname(),  graph_title())
+    file1.open_excel()
 
     file1.plot_points()
     file1.pdf_file()
@@ -25,22 +25,19 @@ def main():
 #this function asks for file name from the user and returns the file name excluding the extension
 def fname():
 
-    fname=input("enter file name:").lower()
+    fname=input("enter file name: or path")
+    return fname
 
-    if fname.endswith(".csv"):
-        return fname[:-4]
+
+#ask sheet name
+def sheet_name():
+    ans=input("Are there multiple sheets?(y/n)")
+    if ans.upper()=="Y" or ans.upper()=="YES" or ans.upper()=="YE" or ans.upper()=="YESS" or ans.upper()=="HELL YES":
+        _sheet_name=input("Enter sheet name of which you want a table")
+        return _sheet_name
     else:
-        return fname
-
-
-#this function asks for the file type from the user
-def ftype():
-    ftype=input("enter file type(formality ko lagi sodheko, i accept nothing but csv):").lower()
-
-    if ftype==".csv" or ftype=="csv":
-        return ".csv"
-    else:
-        raise TypeError("File needs to csv type")
+        return "Sheet1"
+    
 
 
 def graph_title():
@@ -50,25 +47,27 @@ def graph_title():
 
 class File:
 
-    def __init__(self,name,type,title):
-        self.name=name
-        self.type=type
+    def __init__(self,name,title):
+        self.fname=name
         self.title=title
 
-        self.fname=self.name+self.type
 
     #this function constructs data frame for first set of data
     def one_set(self):
         
         self.x_coordinate=80
 
-        #stores the x and y label in respective variables
-        self.x1_label=self.label_list[0]
-        self.y1_label=self.label_list[1]
+        self.df1=pd.read_excel(self.fname,na_values="",usecols="A,B")
 
         #stores values of x and y in list
-        self.x1_values=self.df[self.x1_label].tolist()
-        self.y1_values=self.df[self.y1_label].tolist()
+        self.x1_values=self.df.loc[0]["A"].tolist()
+        self.y1_values=self.df.loc[0]["B"].tolist()
+
+        print(type(self.x1_values))
+
+        
+        self.x1_values.insert(0,self.x1_label)
+        self.y1_values.insert(0,self.y1_label)
 
         if len(self.label_list)>2:
             self.two_set()
@@ -101,6 +100,9 @@ class File:
         self.y2_values=self.df[self.y2_label].tolist()
 
         
+        self.x2_values.insert(0,self.x2_label)
+        self.y2_values.insert(0,self.y2_label)
+
         if len(self.label_list)>4:
             self.three_set()
             return 0
@@ -133,9 +135,13 @@ class File:
         self.y3_values=self.df[self.y3_label].tolist()
 
         
+        self.x3_values.insert(0,self.x3_label)
+        self.y3_values.insert(0,self.y3_label)
+        
         if len(self.label_list)>6:
             self.four_set()
             return 0
+
 
         self.data=np.array([self.x1_values,self.y1_values,
                             self.x2_values,self.y2_values,
@@ -145,10 +151,13 @@ class File:
 
     #this returns the csv values as pandas dataframe object when there is 3 set of data
     def pandas_dataframe3(self):
-        self.dataframe=pd.DataFrame(self.data,
-                                    columns=[self.first_label(),self.first,
-                                            self.second_label(),self.second,
-                                            self.third_label(),self.third])
+        label1=self.first_label()
+        label2=self.second_label()
+        label3=self.third_label()
+        self.dataframe=pd.DataFrame([self.x1_values,self.y1_values,
+                                    self.x2_values,self.y2_values,
+                                    self.x3_values,self.y3_values,
+                                    ], columns=[self.first,self.first,self.second,self.second,self.third,self.third])
 
         self.table_title=self.title+"_table.png"
         dfi.export(self.dataframe,self.table_title)
@@ -166,6 +175,8 @@ class File:
         self.x4_values=self.df[self.x4_label].tolist()
         self.y4_values=self.df[self.y4_label].tolist()
 
+        self.x4_values.insert(0,self.x4_label)
+        self.y4_values.insert(0,self.y4_label)
         
         if len(self.label_list)>8:
             self.five_set()
@@ -201,6 +212,8 @@ class File:
         self.x5_values=self.df[self.x5_label].tolist()
         self.y5_values=self.df[self.y5_label].tolist()
 
+        
+
 
         self.data=[self.x1_values,self.y1_values,
                  self.x2_values,self.y2_values,
@@ -223,13 +236,8 @@ class File:
 
     #opens and stores values of x and y axis title and values
 
-    def open_csv(self):
+    def open_excel(self):
 
-        #opening csv file
-        self.df=pd.read_csv(self.fname)                  
-
-        #label_list stores names of axes label as list
-        self.label_list=self.df.columns.values.tolist()  
 
         self.one_set()
 
