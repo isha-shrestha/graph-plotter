@@ -1,4 +1,4 @@
-![graph plotter](https://github.com/prashansa-shrestha/graph-plotter/assets/138006641/2e36c890-d1dd-4ac8-b9b3-6ce74d97abfd)
+![logo](https://github.com/prashansa-shrestha/graph-plotter/assets/138006641/2e36c890-d1dd-4ac8-b9b3-6ce74d97abfd)
 
 # Graph Plotter
 
