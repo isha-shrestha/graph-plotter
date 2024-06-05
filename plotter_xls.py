@@ -3,7 +3,6 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 import dataframe_image as dfi
 from fpdf import FPDF
 import os
@@ -13,31 +12,33 @@ import cv2
 
 def main():
 
-    file1=File(fname(),  graph_title())
+    file1=File(fname(),ftype(), graph_title())
     file1.open_excel()
 
     file1.plot_points()
     file1.pdf_file()
+
     file1.delete_extra_files()
 
     print(file1.final_message())
 
 #this function asks for file name from the user and returns the file name excluding the extension
 def fname():
-
-    fname=input("enter file name: or path")
-    return fname
-
-
-#ask sheet name
-def sheet_name():
-    ans=input("Are there multiple sheets?(y/n)")
-    if ans.upper()=="Y" or ans.upper()=="YES" or ans.upper()=="YE" or ans.upper()=="YESS" or ans.upper()=="HELL YES":
-        _sheet_name=input("Enter sheet name of which you want a table")
-        return _sheet_name
+    fname=input("enter file name:").lower()
+    if fname.endswith(".xlsx"):
+        return fname[:-5]
     else:
-        return "Sheet1"
-    
+        return fname
+
+
+#this function asks for the file type from the user
+def ftype():
+    ftype=input("enter file type(formality ko lagi sodheko, i accept nothing but xlsx(excel)):").lower()
+
+    if ftype==".xlsx" or ftype=="xlsx":
+        return ".xlsx"
+    else:
+        raise TypeError("File needs to xlsx type")
 
 
 def graph_title():
@@ -47,27 +48,25 @@ def graph_title():
 
 class File:
 
-    def __init__(self,name,title):
-        self.fname=name
+    def __init__(self,name,type,title):
+        self.name=name
+        self.type=type
         self.title=title
 
+        self.fname=self.name+self.type
 
     #this function constructs data frame for first set of data
     def one_set(self):
         
         self.x_coordinate=80
 
-        self.df1=pd.read_excel(self.fname,na_values="",usecols="A,B")
+        #stores the x and y label in respective variables
+        self.x1_label=self.label_list[0]
+        self.y1_label=self.label_list[1]
 
         #stores values of x and y in list
-        self.x1_values=self.df.loc[0]["A"].tolist()
-        self.y1_values=self.df.loc[0]["B"].tolist()
-
-        print(type(self.x1_values))
-
-        
-        self.x1_values.insert(0,self.x1_label)
-        self.y1_values.insert(0,self.y1_label)
+        self.x1_values=self.df[self.x1_label].tolist()
+        self.y1_values=self.df[self.y1_label].tolist()
 
         if len(self.label_list)>2:
             self.two_set()
@@ -100,9 +99,6 @@ class File:
         self.y2_values=self.df[self.y2_label].tolist()
 
         
-        self.x2_values.insert(0,self.x2_label)
-        self.y2_values.insert(0,self.y2_label)
-
         if len(self.label_list)>4:
             self.three_set()
             return 0
@@ -135,29 +131,20 @@ class File:
         self.y3_values=self.df[self.y3_label].tolist()
 
         
-        self.x3_values.insert(0,self.x3_label)
-        self.y3_values.insert(0,self.y3_label)
-        
         if len(self.label_list)>6:
             self.four_set()
             return 0
 
-
-        self.data=np.array([self.x1_values,self.y1_values,
-                            self.x2_values,self.y2_values,
-                            self.x3_values,self.y3_values])
+        self.data=[self.x1_values,self.y1_values,self.x2_values,
+                    self.y2_values,self.x3_values,self.y3_values]
         self.pandas_dataframe3()
 
 
     #this returns the csv values as pandas dataframe object when there is 3 set of data
     def pandas_dataframe3(self):
-        label1=self.first_label()
-        label2=self.second_label()
-        label3=self.third_label()
-        self.dataframe=pd.DataFrame([self.x1_values,self.y1_values,
-                                    self.x2_values,self.y2_values,
-                                    self.x3_values,self.y3_values,
-                                    ], columns=[self.first,self.first,self.second,self.second,self.third,self.third])
+        self.dataframe=pd.DataFrame({self.x1_label:self.x1_values, self.y1_label:self.y1_values,
+                                self.x2_label:self.x2_values, self.y2_label:self.y2_values,
+                                self.x3_label:self.x3_values, self.y3_label:self.y3_values})
 
         self.table_title=self.title+"_table.png"
         dfi.export(self.dataframe,self.table_title)
@@ -175,8 +162,6 @@ class File:
         self.x4_values=self.df[self.x4_label].tolist()
         self.y4_values=self.df[self.y4_label].tolist()
 
-        self.x4_values.insert(0,self.x4_label)
-        self.y4_values.insert(0,self.y4_label)
         
         if len(self.label_list)>8:
             self.five_set()
@@ -193,8 +178,7 @@ class File:
         self.dataframe=pd.DataFrame({self.x1_label:self.x1_values, self.y1_label:self.y1_values,
                                 self.x2_label:self.x2_values, self.y2_label:self.y2_values,
                                 self.x3_label:self.x3_values, self.y3_label:self.y3_values,
-                                self.x4_label:self.x4_values, self.y4_label:self.y4_values},
-                                columns=[self.first(),self.second(),self.third(),self.fourth()])
+                                self.x4_label:self.x4_values, self.y4_label:self.y4_values})
 
         self.table_title=self.title+"_table.png"
         dfi.export(self.dataframe,self.table_title)
@@ -211,8 +195,6 @@ class File:
         #stores values of x and y in list
         self.x5_values=self.df[self.x5_label].tolist()
         self.y5_values=self.df[self.y5_label].tolist()
-
-        
 
 
         self.data=[self.x1_values,self.y1_values,
@@ -238,6 +220,11 @@ class File:
 
     def open_excel(self):
 
+        #opening csv file
+        self.df=pd.read_excel(self.fname)                  
+
+        #label_list stores names of axes label as list
+        self.label_list=self.df.columns.values.tolist()  
 
         self.one_set()
 
@@ -274,26 +261,27 @@ class File:
             plt.plot(self.x1_values,self.y1_values,marker=".")
 
         if len(self.label_list)>2:
-            plt.plot(self.x1_values,self.y1_values,marker=".",label=self.first)
-            plt.plot(self.x2_values,self.y2_values,marker=".",label=self.second)
+            plt.plot(self.x1_values,self.y1_values,marker=".",label=self.first_label())
+            plt.plot(self.x2_values,self.y2_values,marker=".",label=self.second_label())
 
         if len(self.label_list)>4:
-            plt.plot(self.x3_values,self.y3_values,marker=".",label=self.third)  
+            plt.plot(self.x3_values,self.y3_values,marker=".",label=self.third_label())  
 
         if len(self.label_list)>6:  
-            plt.plot(self.x4_values,self.y4_values,marker=".",label=self.fourth)
+            plt.plot(self.x4_values,self.y4_values,marker=".",label=self.fourth_label())
 
         if len(self.label_list)>8:
             plt.plot(self.x5_values,self.y5_values,marker=".",label=self.fifth_label())   
 
         if len(self.label_list)>2:
             plt.legend(loc="best")
-
-        plt.xlabel(self.x1_label)
-        plt.ylabel(self.y1_label)
              
         self.save_as=self.title+".png"
         plt.savefig(self.save_as)
+
+        im=cv2.imread(self.save_as)
+        self.table_width=im.shape[1]
+
 
 
 
