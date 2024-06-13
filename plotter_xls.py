@@ -1,4 +1,4 @@
-#this program reads a csv file, returns the graph and table(optionally) in pdf format
+#this program reads a xlsx file, returns the graph and table(optionally) in pdf format
 
 
 import matplotlib.pyplot as plt
